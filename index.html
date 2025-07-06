@@ -2929,7 +2929,7 @@
 
                         // Apply Dynamic Strategy Weighting (Phase 4, conceptual for now)
                         // If useDynamicStrategy is true, a winning AI model's prediction might get a further boost.
-                        if (useDynamicStrategy && mlProbabilities && isAiReady) {
+                        if (useDynamicStrategy && aiPredictionData && isAiReady) {
                             // This part of dynamic weighting based on individual model performance
                             // is now handled by the worker in `getPredictionProbabilitiesFromWorker`
                             // when it calculates `ensembleWeights`.
