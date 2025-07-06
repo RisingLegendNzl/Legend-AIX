@@ -2062,11 +2062,11 @@
                                 }
                                 // Update dynamic confidence thresholds based on actual outcomes and AI probabilities
                                 
-                                if (recommendedDetails && recommendedDetails.mlProbability !== null) {
+                                if (item.recommendationDetails && item.recommendationDetails.mlProbability !== null) {
                                     const actualOutcome = item.hitTypes.includes(item.recommendedGroupId);
                                     const currentThresholdForPlay = aiConfidenceThresholds.play; 
                                     const currentThresholdForStrongPlay = aiConfidenceThresholds.strongPlay;
-                                    const aiScore = recommendedDetails.mlProbability * 25; 
+                                    const aiScore = item.recommendationDetails.mlProbability * 25; 
 
                                     if (actualOutcome) { 
                                         aiConfidenceThresholds.play = Math.max(MIN_CONFIDENCE_THRESHOLD, currentThresholdForPlay - (ADAPTIVE_THRESHOLD_LEARNING_RATE * (aiScore / MAX_CONFIDENCE_THRESHOLD)));
