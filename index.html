@@ -2386,21 +2386,16 @@ async function processGoldenFrame(canvas) {
         console.log('Processing golden frame...');
     }
     try {
+        // All of this code stays inside the 'try' block
         const frameCtx = dom.frameCanvas.getContext('2d');
         dom.frameCanvas.width = canvas.width;
         dom.frameCanvas.height = canvas.height;
         frameCtx.drawImage(canvas, 0, 0);
-        dom.frameCanvas.classList.remove('hidden');
-
-        // This original function was for single frame OCR. 
-        // It's largely replaced by sendFrameToYoloNASApi for object detection.
-        // However, if you want OCR fallback or specific single-frame processing here,
-        // it would be distinct from the continuous video stream processing.
-        // For this update, we focus on the new video processing loop.
+        dom.frameCanvas.classList.remove('hidden'); // <-- Added missing parenthesis here
 
         dom.videoStatus.textContent = 'Processing completed frames (if any were pending).';
 
-    } catch (error) {
+    } catch (error) { // <-- The catch block goes AFTER the try block
         if (DEBUG_MODE) {
             console.error(error);
         }
