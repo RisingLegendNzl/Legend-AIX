@@ -2054,7 +2054,7 @@
                                             aiModelPerformance[modelName].total++;
                                             aiModelPerformance[modelName].recentAccuracy = aiModelPerformance[modelName].hits / aiModelPerformance[modelName].total;
 
-                                            if (aiModelPerformance[modelName].total > RECENT_PERFORMANCE_WINDOW) {
+if (aiModelPerformance[modelName].total > RECENT_PERFORMANCE_WINDOW) {
                                                 aiModelPerformance[modelName].hits = Math.max(0, aiModelPerformance[modelName].hits * ((RECENT_PERFORMANCE_WINDOW - 1) / RECENT_PERFORMANCE_WINDOW));
                                                 aiModelPerformance[modelName].total = Math.max(0, aiModelPerformance[modelName].total - 1); // Simulate rolling window
                                             }
@@ -2077,10 +2077,10 @@
                                         aiConfidenceThresholds.strongPlay = Math.min(MAX_CONFIDENCE_THRESHOLD, currentThresholdForStrongPlay + (ADAPTIVE_THRESHOLD_LEARNING_RATE * (1 - (aiScore / MAX_CONFIDENCE_THRESHOLD))));
                                     }
                                 }
-                            }
-
-                            updatePatternMemory();
-                        }
+                            } // Correct closing brace for the `if (item.recommendedGroupId ...)` block
+                            // This `updatePatternMemory()` call should be outside the `if` block, but still within the `for` loop
+                            updatePatternMemory(); 
+                        } // Correct closing brace for the `for (let i = 0; ...)` loop
                         
                         history.forEach((item, i) => {
                             const historySliceForStreak = history.slice(0, i + 1);
