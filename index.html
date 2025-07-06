@@ -2381,32 +2381,32 @@
                     }
 
 
-                    async function processGoldenFrame(canvas) {
-                        if (DEBUG_MODE) {
-                            console.log('Processing golden frame...');
-                        }
-                        try {
-                            const frameCtx = dom.frameCanvas.getContext('2d');
-                            dom.frameCanvas.width = canvas.width;
-                            dom.frameCanvas.height = canvas.height;
-                            frameCtx.drawImage(canvas, 0, 0);
-                            dom.frameCanvas.classList.remove('hidden');
+async function processGoldenFrame(canvas) {
+    if (DEBUG_MODE) {
+        console.log('Processing golden frame...');
+    }
+    try {
+        const frameCtx = dom.frameCanvas.getContext('2d');
+        dom.frameCanvas.width = canvas.width;
+        dom.frameCanvas.height = canvas.height;
+        frameCtx.drawImage(canvas, 0, 0);
+        dom.frameCanvas.classList.remove('hidden');
 
-                            // This original function was for single frame OCR. 
-                            // It's largely replaced by sendFrameToYoloNASApi for object detection.
-                            // However, if you want OCR fallback or specific single-frame processing here,
-                            // it would be distinct from the continuous video stream processing.
-                            // For this update, we focus on the new video processing loop.
+        // This original function was for single frame OCR. 
+        // It's largely replaced by sendFrameToYoloNASApi for object detection.
+        // However, if you want OCR fallback or specific single-frame processing here,
+        // it would be distinct from the continuous video stream processing.
+        // For this update, we focus on the new video processing loop.
 
-                            dom.videoStatus.textContent = 'Processing completed frames (if any were pending).';
+        dom.videoStatus.textContent = 'Processing completed frames (if any were pending).';
 
-                        } catch (error) {
-                            if (DEBUG_MODE) {
-                                console.error(error);
-                            }
-                            dom.videoStatus.textContent = `Error during video processing: `+error.message;
-                        }
-                    }
+    } catch (error) {
+        if (DEBUG_MODE) {
+            console.error(error);
+        }
+        dom.videoStatus.textContent = `Error during video processing: ` + error.message;
+    }
+}
 
 
                     function handleSwap() { 
