@@ -2950,7 +2950,7 @@
                                     confluenceBonus: confluenceBonus,
                                     primaryDrivingFactor: primaryDrivingFactor,
                                     adaptiveInfluenceUsed: adaptiveInfluenceUsed,
-                                    mlProbability: mlProbabilities ? mlProbabilities[type.id] : null,
+                                    mlProbability: aiPredictionData?.groups?.[type.id] || null,
                                     mlBoostApplied: mlBoostApplied,
                                     patternBoostApplied: patternBoostApplied,
                                     patternBoostMultiplier: patternInfo ? (finalScore / (baseScore * adaptiveInfluenceUsed)) : 1, // Crude way to show multiplier
