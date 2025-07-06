@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -151,7 +150,7 @@
         .strategy-guide-content {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.5s ease-in-out, padding-top 0.5s ease-in-out, margin-top 0.5s ease-in-out;
+            transition: max-height 0.5s ease-in-out, padding-top 0.5s ease-in-out, margin-top 0.5s ease-in-out, border-top 0.5s ease-in-out; /* Added border-top transition */
             padding-top: 0;
             padding-bottom: 0;
             border-top: 1px solid transparent;
@@ -814,7 +813,7 @@
                         useWeightedZone = appState.useWeightedZone ?? true;
                         useProximityBoost = appState.useProximityBoost ?? true;
                         usePocketDistance = appState.usePocketDistance || false;
-                        useLowestPocketDistance = appState.lowestPocketDistance || false;
+                        useLowestPocketDistance = appState.useLowestPocketDistance || false;
                         useAdvancedCalculations = appState.useAdvancedCalculations || false;
                         useNeighbourFocus = appState.useNeighbourFocus || false;
                         useDueForHit = appState.useDueForHit || false;
@@ -2054,7 +2053,7 @@
                                             aiModelPerformance[modelName].total++;
                                             aiModelPerformance[modelName].recentAccuracy = aiModelPerformance[modelName].hits / aiModelPerformance[modelName].total;
 
-if (aiModelPerformance[modelName].total > RECENT_PERFORMANCE_WINDOW) {
+                                            if (aiModelPerformance[modelName].total > RECENT_PERFORMANCE_WINDOW) {
                                                 aiModelPerformance[modelName].hits = Math.max(0, aiModelPerformance[modelName].hits * ((RECENT_PERFORMANCE_WINDOW - 1) / RECENT_PERFORMANCE_WINDOW));
                                                 aiModelPerformance[modelName].total = Math.max(0, aiModelPerformance[modelName].total - 1); // Simulate rolling window
                                             }
@@ -2062,7 +2061,7 @@ if (aiModelPerformance[modelName].total > RECENT_PERFORMANCE_WINDOW) {
                                     }
                                 }
                                 // Update dynamic confidence thresholds based on actual outcomes and AI probabilities
-                                const recommendedDetails = item.recommendationDetails;
+                                
                                 if (recommendedDetails && recommendedDetails.mlProbability !== null) {
                                     const actualOutcome = item.hitTypes.includes(item.recommendedGroupId);
                                     const currentThresholdForPlay = aiConfidenceThresholds.play; 
@@ -2077,10 +2076,9 @@ if (aiModelPerformance[modelName].total > RECENT_PERFORMANCE_WINDOW) {
                                         aiConfidenceThresholds.strongPlay = Math.min(MAX_CONFIDENCE_THRESHOLD, currentThresholdForStrongPlay + (ADAPTIVE_THRESHOLD_LEARNING_RATE * (1 - (aiScore / MAX_CONFIDENCE_THRESHOLD))));
                                     }
                                 }
-                            } // Correct closing brace for the `if (item.recommendedGroupId ...)` block
-                            // This `updatePatternMemory()` call should be outside the `if` block, but still within the `for` loop
-                            updatePatternMemory(); 
-                        } // Correct closing brace for the `for (let i = 0; ...)` loop
+                            }
+                            updatePatternMemory(); // This `updatePatternMemory()` call should be here
+                        } // This closes the main for loop correctly (the loop over reversedNumbers)
                         
                         history.forEach((item, i) => {
                             const historySliceForStreak = history.slice(0, i + 1);
@@ -2096,7 +2094,7 @@ if (aiModelPerformance[modelName].total > RECENT_PERFORMANCE_WINDOW) {
                             item.confirmedStreak = maxConfirmedStreak;
                         });
                         
-                        labelHistoryFailures(history);
+                        labelHistoryFailures(history.slice().sort((a, b) => a.id - b.id));
 
                         confirmedWinsLog = history.map(item => item.winningNumber).filter(n => n !== undefined && n !== null);
 
@@ -2893,19 +2891,12 @@ if (aiModelPerformance[modelName].total > RECENT_PERFORMANCE_WINDOW) {
 
                         // 8. Prioritize Lowest Pocket Distance (OVERRIDE)
                         let aiLowestPocketDistanceScore = 0;
-                        if (useLowestPocketDistance && mlProbabilities && isAiReady) {
+                        if (useLowestPocketDistance && aiPredictionData && isAiReady) {
                             const lastWinningNumber = confirmedWinsLog.length > 0 ? confirmedWinsLog[confirmedWinsLog.length -1] : null;
                             if (lastWinningNumber !== null) {
-                                const aiRecommendedPocketDistance = mlProbabilities['recommendedGroupPocketDistance']; // Assuming worker provides this
-                                // This would require the AI to output a pocket distance or predict numbers directly
-                                // For now, we'll simulate this if it's not available from the ML model directly
-                                
-                                // To truly implement this, the AI model needs to predict the winning number or its direct distance.
-                                // If the AI directly predicted a number, you'd calculate its distance.
-                                // If the AI outputs 'recommendedGroupPocketDistance', use that.
                                 // For conceptual placeholder: if the current type's hit zone is very close to last winning number,
                                 // and AI confidence is high for this group, give a strong boost.
-                                if (mlProbabilities[type.id] > 0.6) { // If AI is confident in this group
+                                if (aiPredictionData.groups && aiPredictionData.groups[type.id] > 0.6) { 
                                     let minHitZonePocketDistance = Infinity;
                                     hitZone.forEach(numInZone => {
                                         const dist = calculatePocketDistance(numInZone, lastWinningNumber);
@@ -2913,8 +2904,8 @@ if (aiModelPerformance[modelName].total > RECENT_PERFORMANCE_WINDOW) {
                                             minHitZonePocketDistance = dist;
                                         }
                                     });
-                                    if (minHitZonePocketDistance <= 1 && minHitZonePocketDistance !== Infinity) { // If very close
-                                        aiLowestPocketDistanceScore = 20; // Significant boost
+                                    if (minHitZonePocketDistance <= 1 && minHitZonePocketDistance !== Infinity) { 
+                                        aiLowestPocketDistanceScore = 20; 
                                         aiLowPocketBoostApplied = true;
                                         primaryDrivingFactor = 'AI-Driven Proximity';
                                     }
@@ -2933,7 +2924,7 @@ if (aiModelPerformance[modelName].total > RECENT_PERFORMANCE_WINDOW) {
                             // This part of dynamic weighting based on individual model performance
                             // is now handled by the worker in `getPredictionProbabilitiesFromWorker`
                             // when it calculates `ensembleWeights`.
-                            // So, the `mlProbabilities` already reflect this dynamic weighting.
+                            // So, the `aiPredictionData` already reflect this dynamic weighting.
                             // No additional weighting needed here based on the ensemble.
                         }
 
@@ -2950,23 +2941,22 @@ if (aiModelPerformance[modelName].total > RECENT_PERFORMANCE_WINDOW) {
                                     confluenceBonus: confluenceBonus,
                                     primaryDrivingFactor: primaryDrivingFactor,
                                     adaptiveInfluenceUsed: adaptiveInfluenceUsed,
-                                    mlProbability: aiPredictionData?.groups?.[type.id] || null,
+                                    mlProbability: aiPredictionData?.groups?.[type.id] || null, 
                                     mlBoostApplied: mlBoostApplied,
                                     patternBoostApplied: patternBoostApplied,
-                                    patternBoostMultiplier: patternInfo ? (finalScore / (baseScore * adaptiveInfluenceUsed)) : 1, // Crude way to show multiplier
+                                    patternBoostMultiplier: patternInfo ? (finalScore / (baseScore * adaptiveInfluenceUsed)) : 1, 
                                     proximityBoostApplied: proximityBoostApplied,
                                     weightedZoneBoostApplied: weightedZoneBoostApplied,
                                     aiLowPocketBoostApplied: aiLowPocketBoostApplied,
                                     hitRate: averageHitRate,
                                     avgTrend: trendStats.averages?.[type.id] ?? 0,
-                                    predictiveDistance: predictiveDistance, // New
+                                    predictiveDistance: predictiveDistance, 
                                     finalScore: finalScore,
                                     // Add individual model probabilities for tracking
                                     individualModelProbs: null // This will be populated from predictionData.individualModelProbs in displayCalculationResult
                                 }
                             };
                         }
-                    });
 
                     let recommendationHtml = '';
                     let recommendationSignal = 'Wait'; // Default signal
