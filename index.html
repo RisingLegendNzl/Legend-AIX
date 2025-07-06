@@ -3036,7 +3036,7 @@
                                 // We keep this check here for the 'Avoid Now' signal.
                             }
                         }
-                        const failureProbs = aiPredictionData?.failures;
+                        
                         if (bestCandidate.details.mlProbability !== null && bestCandidate.details.mlProbability < 0.3 && (failureProbs?.streakBreak > 0.5 || failureProbs?.sectionShift > 0.5)) {
                             recommendationSignal = 'Avoid Now';
                             confidenceText = ` <span class="text-red-600">(High Risk)</span>`;
