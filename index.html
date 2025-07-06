@@ -2739,7 +2739,7 @@
                         
                         function getRecommendation(trendStats, boardStats, neighbourScores, currentDifference, isSimulated = false, aiPredictionData = null, adaptiveInfluences, aiConfidenceThresholds) {
                     if (DEBUG_MODE) {
-                        console.log('Getting recommendation with currentDifference:', currentDifference, 'mlProbabilities:', mlProbabilities);
+                        console.log('Getting recommendation with currentDifference:', currentDifference, 'aiPredictionData:', aiPredictionData);
                     }
                     let bestCandidate = null;
                     let highestScore = -Infinity;
