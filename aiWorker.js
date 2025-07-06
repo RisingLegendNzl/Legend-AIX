@@ -7,16 +7,16 @@ const ENSEMBLE_CONFIG = [
     {
         name: 'Specialist',
         path: 'roulette-ml-model-specialist',
-        lstmUnits: 32, // Optimized Value
-        epochs: 58,    // Optimized Value
-        batchSize: 16, // Optimized Value
+        lstmUnits: 16, // Smaller, faster model
+        epochs: 40,
+        batchSize: 32,
     },
     {
         name: 'Generalist',
         path: 'roulette-ml-model-generalist',
-        lstmUnits: 96, // Optimized Value
-        epochs: 67,    // Optimized Value
-        batchSize: 32, // Optimized Value
+        lstmUnits: 64, // Larger, more complex model
+        epochs: 60,
+        batchSize: 16,
     }
 ];
 
@@ -158,13 +158,9 @@ async function trainEnsemble(historyData) {
     for (const member of ensemble) {
         try {
             self.postMessage({ type: 'status', message: `AI Ensemble: Training ${member.name}...` });
-// Dispose old model before training
-            if (member.model) {
-                member.model.dispose();
-                member.model = null; // Ensure the reference is cleared
-            }
+            if (member.model) member.model.dispose(); // Dispose old model before training
             
-            member.model = createMultiOutputLSTMModel([SEQUENCE_LENGTH, featureCount], groupLabelCount, failureLabelCount, member.lstmUnits); // Corrected 'failureLabelUnits' to 'failureLabelCount'
+            member.model = createMultiOutputLSTMModel([SEQUENCE_LENGTH, featureCount], groupLabelCount, failureLabelCount, member.lstmUnits);
             
             await member.model.fit(xs, ys, {
                 epochs: member.epochs,
@@ -205,7 +201,7 @@ async function predictWithEnsemble(historyData) {
     
     const getFeatures = (item) => {
         const props = getNumberProperties(item.winningNumber);
-        return [
+         return [
             item.num1 / 36, item.num2 / 36, item.difference / 36,
             item.pocketDistance !== null ? item.pocketDistance / 18 : 0,
             item.recommendedGroupPocketDistance !== null ? item.recommendedGroupPocketDistance / 18 : 1,
