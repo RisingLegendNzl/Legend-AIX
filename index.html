@@ -2039,8 +2039,8 @@
                             // Update AI model performance tracking based on the actual winning number for historical analysis
                             if (item.recommendedGroupId && item.recommendationDetails && item.recommendationDetails.individualModelProbs) {
                                 for (const modelName in aiModelPerformance) { 
-                                    const modelIdx = ENSEMBLE_CONFIG.findIndex(m => m.name === modelName);
-                                    if (modelIdx !== -1) {
+                                    // No need for ENSEMBLE_CONFIG here, as modelName is already a valid key in aiModelPerformance
+                                    // The loop iterates over valid model names directly.
                                         const modelProbsArray = item.recommendationDetails.individualModelProbs[modelName]; 
                                         const predictedHitTypeIndex = allPredictionTypes.findIndex(type => type.id === item.recommendedGroupId);
 
